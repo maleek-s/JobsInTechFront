@@ -9,7 +9,7 @@
     "rewrites": [
       {
         "source": "/sitemap.xml",
-        "destination": "https://your-backend-url.onrender.com/sitemap.xml"
+        "destination": "https://job-portal-r.onrender.com/sitemap.xml"
       },
       {
         "source": "**",
