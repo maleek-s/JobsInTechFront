@@ -9,6 +9,7 @@ import JobDescription from './components/JobDescription'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import JobsByCategory from './components/JobsByCategory'
 import Contact from './components/Contact'
+import NotFoundPage from './components/NotFoundPage'
 
 
 const appRouter = createBrowserRouter([
@@ -41,14 +42,19 @@ const appRouter = createBrowserRouter([
     element: <Contact />
   },
   {
-    path: "/profile",
+    path: "/profile", // ✅ Regular users can access this
     element: <ProtectedRoute><Profile /></ProtectedRoute>
-  },{
-    path: "/jobs",
-    element: <ProtectedRoute><Jobs /></ProtectedRoute>
+  },
+  {
+    path: "/jobs", // 🔒 Admin-only
+    element: <ProtectedRoute requireAdmin={true}><Jobs /></ProtectedRoute>
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />
   }
+]);
 
-])
 function App() {
 
   return (

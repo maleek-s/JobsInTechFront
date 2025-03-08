@@ -1,4 +1,5 @@
 import { setAllAppliedJobs } from "@/redux/jobSlice";
+import { setLoading } from "@/redux/loadingSlice"; // Import setLoading action
 import { APPLICATION_API_END_POINT } from "@/utils/constant";
 import axios from "axios";
 import { useEffect } from "react";
@@ -9,6 +10,8 @@ const useGetAppliedJobs = () => {
 
     useEffect(() => {
         const fetchAppliedJobs = async () => {
+            dispatch(setLoading(true)); // Show Loader
+
             try {
                 const res = await axios.get(`${APPLICATION_API_END_POINT}/get`, { withCredentials: true });
                 if (res.data.success) {
@@ -16,13 +19,15 @@ const useGetAppliedJobs = () => {
                 }
             } catch (error) {
                 if (error.response && error.response.status === 404) {
-                    // If 404 error, set applications to an empty array
                     dispatch(setAllAppliedJobs([]));
                 } else {
                     console.log(error);
                 }
+            } finally {
+                dispatch(setLoading(false)); // Hide Loader
             }
         };
+
         fetchAppliedJobs();
     }, [dispatch]);
 };

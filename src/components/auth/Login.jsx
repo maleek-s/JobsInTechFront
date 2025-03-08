@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { signInWithGoogle } from "@/firebase"; // Import the function
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import RightContent from "../../assets/RightContent.jpg";
 import LogoWhite from "../../assets/Logo-White.png";
 import Logo from "../../assets/Logo.png";
 import { Button } from "../ui/button";
-import { Link, useNavigate, useSearchParams} from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { toast } from "sonner";
@@ -62,20 +63,58 @@ const Login = () => {
     }
   }, [user, navigate, searchParams]);
 
-    // Check theme from localStorage and apply on component mount
-    useEffect(() => {
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme === "dark") {
-        document.documentElement.classList.add("dark");
-        setIsDarkTheme(true);
-      } else {
-        document.documentElement.classList.remove("dark");
-        setIsDarkTheme(false);
+  // Check theme from localStorage and apply on component mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+      setIsDarkTheme(true);
+    } else {
+      document.documentElement.classList.remove("dark");
+      setIsDarkTheme(false);
+    }
+  }, []);
+
+  const googleLoginHandler = async (e) => {
+    e.preventDefault(); // Prevent form submission
+    console.log("Starting Google login...");
+  
+    const result = await signInWithGoogle();
+    console.log("Google login result:", result);
+  
+    if (result.success) {
+      try {
+        console.log("Sending Google login data to backend...");
+        const res = await axios.post(
+          `${USER_API_END_POINT}/google-login`,
+          {
+            idToken: result.idToken, // ✅ Send ID token
+          },
+          { withCredentials: true }
+        );
+  
+        console.log("Backend response:", res.data);
+  
+        if (res.data.success) {
+          dispatch(setUser(res.data.user));
+          toast.success("Logged in successfully!");
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Google Login backend request failed:", error);
+        toast.error("Google Login failed.");
       }
-    }, []);
+    } else {
+      console.error("Google Login failed:", result.error);
+      toast.error("Google Login failed.");
+    }
+  };
+  
+  
+  
 
   return (
-    <div className="bg-white dark:bg-[#141718] h-screen">
+    <div className="bg-[#141718] h-screen">
       <Helmet>
         <title>Login</title>
         <meta name="description" content="Login to your account" />
@@ -83,7 +122,7 @@ const Login = () => {
       </Helmet>
       <Link to="/">
         <img
-          src={isDarkTheme ? Logo : LogoWhite}
+          src={Logo}
           alt="Logo"
           className="absolute top-0 left-1/2 transform -translate-x-1/2 mt-5 w-24 z-[100]"
         />
@@ -100,7 +139,7 @@ const Login = () => {
             <form
               onSubmit={submitHandler}
               autoComplete="off"
-              className="bg-white dark:bg-gray-800 p-6 rounded-md shadow-lg w-11/12 max-w-md"
+              className="bg-gray-800 p-6 rounded-md shadow-lg w-11/12 max-w-md"
             >
               <h1 className="font-bold text-xl mb-5 text-black dark:text-white">
                 Welcome back!
@@ -136,9 +175,18 @@ const Login = () => {
                   <Loader2 className="h-4 w-4 animate-spin" /> Please wait
                 </Button>
               ) : (
-                <Button className="w-full my-4 bg-blue-500 text-white hover:bg-blue-600">
-                  Login
-                </Button>
+                <div>
+                  {" "}
+                  <Button className="w-full my-4 bg-blue-500 text-white hover:bg-blue-600">
+                    Login
+                  </Button>
+                  <Button
+                    onClick={(e) => googleLoginHandler(e)} // Ensure it doesn't trigger form submit
+                    className="w-full my-4 bg-red-500 text-white hover:bg-red-600"
+                  >
+                    Sign in with Google
+                  </Button>
+                </div>
               )}
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 Don't have an account?{" "}
@@ -150,7 +198,7 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="hidden lg:flex items-center justify-center w-1/2 bg-gray-50 dark:bg-gray-900">
+        <div className="hidden lg:flex items-center justify-center w-1/2 bg-gray-900">
           <form
             onSubmit={submitHandler}
             autoComplete="off"
@@ -188,9 +236,17 @@ const Login = () => {
                 <Loader2 className="h-4 w-4 animate-spin" /> Please wait
               </Button>
             ) : (
-              <Button className="w-full my-4 bg-blue-500 text-white hover:bg-blue-600">
-                Login
-              </Button>
+              <div>
+                <Button
+                  onClick={(e) => googleLoginHandler(e)} // Ensure it doesn't trigger form submit
+                  className="w-full my-4 bg-red-500 text-white hover:bg-red-600"
+                >
+                  Sign in with Google
+                </Button>
+                <Button className="w-full my-4 bg-blue-500 text-white hover:bg-blue-600">
+                  Login
+                </Button>
+              </div>
             )}
             <span className="text-sm text-gray-600 dark:text-gray-400">
               Don't have an account?{" "}
