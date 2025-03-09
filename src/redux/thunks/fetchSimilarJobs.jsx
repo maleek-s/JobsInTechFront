@@ -5,7 +5,13 @@ import { JOB_API_END_POINT } from "@/utils/constant";
 // Thunk to fetch similar jobs by category
 export const fetchSimilarJobs = createAsyncThunk(
   "job/fetchSimilarJobs",
-  async (jobCategory, { rejectWithValue }) => {
+  async (jobCategory, { getState, rejectWithValue }) => {
+    const cachedJobs = getState().job.similarJobs[jobCategory];
+
+    if (cachedJobs) {
+      return cachedJobs; // Use cached data first
+    }
+
     try {
       const response = await axios.get(`${JOB_API_END_POINT}/categories/${jobCategory}`, {
         withCredentials: true,
@@ -21,3 +27,4 @@ export const fetchSimilarJobs = createAsyncThunk(
     }
   }
 );
+
