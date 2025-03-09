@@ -7,7 +7,7 @@ const jobSlice = createSlice({
   name: "job",
   initialState: {
     allJobs: [],
-    jobCategory: [],
+    jobCategory: ["UXUI", "SupportIT", "DataAnalyst", "Marketing", "Frontend", "ProductManager", "CustomerSupport", "Fullstack", "Backend", "Miscellaneous:"],
     singleJob: { jobContent: [] }, // Keep this
     similarJobs: [],
     searchJobByText: "",
