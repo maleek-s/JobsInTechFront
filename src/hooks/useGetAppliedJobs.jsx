@@ -11,9 +11,20 @@ const useGetAppliedJobs = () => {
     useEffect(() => {
         const fetchAppliedJobs = async () => {
             dispatch(setLoading(true)); // Show Loader
-
+        
             try {
-                const res = await axios.get(`${APPLICATION_API_END_POINT}/get`, { withCredentials: true });
+                const token = localStorage.getItem("token"); // Retrieve Google OAuth token if stored
+        
+                const headers = {
+                    withCredentials: true,
+                };
+        
+                if (token) {
+                    headers.Authorization = `Bearer ${token}`;
+                }
+        
+                const res = await axios.get(`${APPLICATION_API_END_POINT}/get`, { headers });
+        
                 if (res.data.success) {
                     dispatch(setAllAppliedJobs(res.data.applications));
                 }
@@ -26,8 +37,7 @@ const useGetAppliedJobs = () => {
             } finally {
                 dispatch(setLoading(false)); // Hide Loader
             }
-        };
-
+        };    
         fetchAppliedJobs();
     }, [dispatch]);
 };

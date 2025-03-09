@@ -3,7 +3,6 @@ import { signInWithGoogle } from "@/firebase"; // Import the function
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import RightContent from "../../assets/RightContent.jpg";
-import LogoWhite from "../../assets/Logo-White.png";
 import Logo from "../../assets/Logo.png";
 import { Button } from "../ui/button";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -77,14 +76,11 @@ const Login = () => {
 
   const googleLoginHandler = async (e) => {
     e.preventDefault(); // Prevent form submission
-    console.log("Starting Google login...");
   
     const result = await signInWithGoogle();
-    console.log("Google login result:", result);
   
     if (result.success) {
       try {
-        console.log("Sending Google login data to backend...");
         const res = await axios.post(
           `${USER_API_END_POINT}/google-login`,
           {
@@ -93,19 +89,15 @@ const Login = () => {
           { withCredentials: true }
         );
   
-        console.log("Backend response:", res.data);
-  
         if (res.data.success) {
           dispatch(setUser(res.data.user));
           toast.success("Logged in successfully!");
           navigate("/");
         }
       } catch (error) {
-        console.error("Google Login backend request failed:", error);
         toast.error("Google Login failed.");
       }
     } else {
-      console.error("Google Login failed:", result.error);
       toast.error("Google Login failed.");
     }
   };
@@ -141,7 +133,7 @@ const Login = () => {
               autoComplete="off"
               className="bg-gray-800 p-6 rounded-md shadow-lg w-11/12 max-w-md"
             >
-              <h1 className="font-bold text-xl mb-5 text-black dark:text-white">
+              <h1 className="font-bold text-xl mb-5 text-white">
                 Welcome back!
               </h1>
               <div className="my-4">

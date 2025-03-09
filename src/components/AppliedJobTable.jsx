@@ -16,7 +16,7 @@ const AppliedJobTable = () => {
   useGetAppliedJobs(); // Fetches the applied jobs and updates Redux store
   const navigate = useNavigate();
 
-  const { allAppliedJobs } = useSelector(store => store.job);
+  const { allAppliedJobs } = useSelector(store => store.job); 
 
   if (!allAppliedJobs || allAppliedJobs.length === 0) {
     return <span>You haven't applied any job yet.</span>;
