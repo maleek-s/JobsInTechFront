@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setSearchedQuery } from "@/redux/jobSlice";
@@ -27,6 +27,7 @@ import {
 const CategoryCarousel = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [fetchTriggered, setFetchTriggered] = useState(false);
 
   // Call the useFetchCategories hook to fetch data and dispatch to Redux
   useFetchCategories();
@@ -77,8 +78,15 @@ const CategoryCarousel = () => {
     .filter((category) => category) // Remove null, undefined, or falsy values
     .sort((a, b) => a.localeCompare(b));
 
+  const handleMouseEnter = () => {
+    if (!fetchTriggered) {
+      useFetchCategories();
+      setFetchTriggered(true);
+    }
+  };
+
   return (
-    <div className="w-full dark:bg-[#141718] mt-10">
+    <div className="w-full dark:bg-[#141718] mt-10" onMouseEnter={handleMouseEnter}>
       {/* Content */}
       <div className="flex justify-center items-center">
         <div className="flex flex-wrap w-11/12 md:w-8/12 justify-center">

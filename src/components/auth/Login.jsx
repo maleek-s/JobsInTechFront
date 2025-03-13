@@ -32,28 +32,33 @@ const Login = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      dispatch(setLoading(true));
-      const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
-      if (res.data.success) {
-        dispatch(setUser(res.data.user));
-        const redirectUrl = searchParams.get("redirect") || "/";
-        navigate(redirectUrl); // Navigate to the redirect URL or home page
-        toast.success(res.data.message);
-      }
+        dispatch(setLoading(true));
+        const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            withCredentials: true, // Ensures cookies are sent
+        });
+
+        if (res.data.success) {
+            dispatch(setUser(res.data.user));
+
+            // Store the token in localStorage ✅
+            localStorage.setItem("token", res.data.token);
+
+            const redirectUrl = searchParams.get("redirect") || "/";
+            navigate(redirectUrl);
+            toast.success(res.data.message);
+        }
     } catch (error) {
-      console.error(error);
-      const errorMessage =
-        error.response?.data?.message || "An unexpected error occurred.";
-      toast.error(errorMessage);
+        console.error(error);
+        const errorMessage = error.response?.data?.message || "An unexpected error occurred.";
+        toast.error(errorMessage);
     } finally {
-      dispatch(setLoading(false));
+        dispatch(setLoading(false));
     }
-  };
+};
+
 
   useEffect(() => {
     if (user) {
@@ -75,35 +80,35 @@ const Login = () => {
   }, []);
 
   const googleLoginHandler = async (e) => {
-    e.preventDefault(); // Prevent form submission
-  
+    e.preventDefault(); // Prevent default form submission
+
     const result = await signInWithGoogle();
-  
+
     if (result.success) {
-      try {
-        const res = await axios.post(
-          `${USER_API_END_POINT}/google-login`,
-          {
-            idToken: result.idToken, // ✅ Send ID token
-          },
-          { withCredentials: true }
-        );
-  
-        if (res.data.success) {
-          dispatch(setUser(res.data.user));
-          toast.success("Logged in successfully!");
-          navigate("/");
+        try {
+            const res = await axios.post(
+                `${USER_API_END_POINT}/google-login`,
+                { idToken: result.idToken }, // ✅ Send ID token
+                { withCredentials: true }
+            );
+
+            if (res.data.success) {
+                dispatch(setUser(res.data.user));
+
+                // Store the token in localStorage ✅
+                localStorage.setItem("token", res.data.token);
+
+                toast.success("Logged in successfully!");
+                navigate("/");
+            }
+        } catch (error) {
+            toast.error("Google Login failed.");
         }
-      } catch (error) {
-        toast.error("Google Login failed.");
-      }
     } else {
-      toast.error("Google Login failed.");
+        toast.error("Google Login failed.");
     }
-  };
-  
-  
-  
+};
+
 
   return (
     <div className="bg-[#141718] h-screen">

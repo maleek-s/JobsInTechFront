@@ -7,7 +7,18 @@ const jobSlice = createSlice({
   name: "job",
   initialState: {
     allJobs: [],
-    jobCategory: ["UXUI", "SupportIT", "DataAnalyst", "Marketing", "Frontend", "ProductManager", "CustomerSupport", "Fullstack", "Backend", "Miscellaneous:"],
+    jobCategory: [
+      "UXUI",
+      "SupportIT",
+      "DataAnalyst",
+      "Marketing",
+      "Frontend",
+      "ProductManager",
+      "CustomerSupport",
+      "Fullstack",
+      "Backend",
+      "Miscellaneous",
+    ],
     singleJob: { jobContent: [] }, // Keep this
     similarJobs: [],
     searchJobByText: "",
@@ -20,7 +31,7 @@ const jobSlice = createSlice({
     singleJobError: null,
     similarJobsLoading: false,
     similarJobsError: null,
-  },  
+  },
   reducers: {
     setAllJobs: (state, action) => {
       state.allJobs = action.payload;
@@ -30,7 +41,7 @@ const jobSlice = createSlice({
     },
     clearJobs: (state) => {
       state.singleJob = { jobContent: [] };
-    },    
+    },
     setJobCategory: (state, action) => {
       state.jobCategory = action.payload;
     },
@@ -85,7 +96,7 @@ const jobSlice = createSlice({
       .addCase(fetchSimilarJobs.fulfilled, (state, action) => {
         state.similarJobs = action.payload || [];
         state.similarJobsLoading = false;
-      })     
+      })
       .addCase(fetchSimilarJobs.rejected, (state, action) => {
         state.similarJobsLoading = false;
         state.similarJobsError = action.payload;
@@ -101,7 +112,7 @@ export const {
   setSearchJobByText,
   setAllAppliedJobs,
   setSearchedQuery,
-  clearJobs
+  clearJobs,
 } = jobSlice.actions;
 
 export default jobSlice.reducer;

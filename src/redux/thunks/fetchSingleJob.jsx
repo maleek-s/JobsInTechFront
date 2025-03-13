@@ -5,13 +5,7 @@ import { JOB_API_END_POINT } from "@/utils/constant";
 // Thunk to fetch a single job by ID
 export const fetchSingleJob = createAsyncThunk(
   "job/fetchSingleJob",
-  async (jobId, { getState, rejectWithValue }) => {
-    const cachedJob = getState().job.singleJobs[jobId];
-
-    if (cachedJob) {
-      return cachedJob; // Return cached data first
-    }
-
+  async (jobId, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${JOB_API_END_POINT}/get/${jobId}`, {
         withCredentials: true,
@@ -27,4 +21,3 @@ export const fetchSingleJob = createAsyncThunk(
     }
   }
 );
-
