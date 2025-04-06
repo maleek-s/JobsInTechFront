@@ -174,6 +174,13 @@ const Navbar = ({ isHomePage }) => {
     setMenuOpen(false); // Close menu on route change
   }, [location.pathname]); // Trigger when the route changes
 
+  const formatCategoryDisplayName = (category) => {
+    return category
+      .replace(/([a-z])([A-Z])/g, "$1 $2") // Add space between camel case words
+      .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter of each word
+  };
+
+
   return (
     <div>
       <div
@@ -302,10 +309,7 @@ const Navbar = ({ isHomePage }) => {
                         >
                           <Icon className="w-6 h-6 mr-3 text-black dark:text-white" />
                           <div>
-                            <h3>{category || "Unknown"}</h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              Category Description
-                            </p>
+                            <h3>{formatCategoryDisplayName(category)}</h3>
                           </div>
                         </Link>
                       );
@@ -316,7 +320,7 @@ const Navbar = ({ isHomePage }) => {
                 {/* Links */}
                 <li className="border-b border-gray-300 dark:border-gray-600 pb-4">
                   <Link
-                    to="/jobs"
+                    to="/remote"
                     onClick={toggleMenu}
                     className="flex items-center gap-3 text-gray-900 hover:text-gray-400 dark:text-white dark:hover:text-gray-400"
                   >
@@ -431,10 +435,7 @@ const Navbar = ({ isHomePage }) => {
                             {/* Render the appropriate icon */}
                             <Icon className="w-6 h-6 mr-3 text-black dark:text-white" />
                             <div>
-                              <h3>{category || "Unknown"}</h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                Category Description
-                              </p>
+                              <h3>{formatCategoryDisplayName(category)}</h3>
                             </div>
                           </Link>
                         );
@@ -445,9 +446,9 @@ const Navbar = ({ isHomePage }) => {
 
                 <li>
                   <Link
-                    to="/jobs"
+                    to="/remote"
                     className={`block py-2 px-3 rounded ${
-                      location.pathname === "/jobs"
+                      location.pathname === "/remote"
                         ? "text-gray-300 "
                         : "text-gray-900 hover:text-gray-400 dark:text-white dark:hover:text-gray-400"
                     }`}

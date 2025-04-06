@@ -151,7 +151,7 @@ const JobDescription = () => {
           name="description"
           content={singleJob?.description || "Job description page."}
         />
-        <link rel="canonical" href={`/description/${jobId}`} />
+        <link rel="canonical" href={`https://jobsintech.live/description/${jobId}`} />
       </Helmet>
       <Navbar />
 

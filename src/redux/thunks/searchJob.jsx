@@ -5,7 +5,7 @@ export const searchJobs = createAsyncThunk(
   "jobs/search", 
   async (query, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`https://job-portal-r.onrender.com/api/v1/job/search`, { params: { query } });
+      const response = await axios.get(`http://localhost:8000/api/v1/job/search`, { params: { query } });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

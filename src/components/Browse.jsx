@@ -30,7 +30,7 @@ const Browse = () => {
       <Helmet>
         <title>Browse Jobs</title>
         <meta name="description" content="Search for your next remote job" />
-        <link rel="canonical" href="/browse" />
+        <link rel="canonical" href="https://jobsintech.live/browse" />
       </Helmet>
       <Navbar />
       <div className="flex flex-col max-w-7xl mx-auto my-10 px-4 md:px-0">

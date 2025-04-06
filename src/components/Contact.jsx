@@ -39,7 +39,7 @@ const Contact = () => {
 
     useEffect(() => {
       const generateSnowflakes = () => {
-        const newFlakes = Array.from({ length: 50 }, (_, i) => ({
+        const newFlakes = Array.from({ length:5 }, (_, i) => ({
           id: i,
           x: Math.random() * 100, // Horizontal position
           y: Math.random() * -100, // Start above the screen
@@ -74,7 +74,7 @@ const Contact = () => {
       <Helmet>
         <title>Contact Us</title>
         <meta name="description" content="Contact us page" />
-        <link rel="canonical" href="/contact" />
+        <link rel="canonical" href="https://jobsintech.live/contact" />
       </Helmet>
 
       {/* Snowflake Animation */}

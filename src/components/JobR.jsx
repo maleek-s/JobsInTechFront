@@ -1,35 +1,25 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { Bookmark } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-const Job = ({ job }) => {
-  const navigate = useNavigate();
-
-  const daysAgoFunction = (mongodbTime) => {
-    const createdAt = new Date(mongodbTime);
-    const currentTime = new Date();
-    const timeDifference = currentTime - createdAt;
-    return Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+const JobR = ({ job }) => {
+  const handleBookmarkClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(`/description/${job?._id}`, "_blank");
   };
 
-  const daysAgo = daysAgoFunction(job?.createdAt);
-  const isNew = daysAgo <= 3;
-
   return (
-    <div className="p-6 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+    <div className="p-6 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow group">
       <div className="flex justify-between items-start">
-        <div>
+        <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <h1 className="font-bold text-lg dark:text-white">{job?.title}</h1>
-            {isNew && (
-              <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full dark:bg-green-900 dark:text-green-200">
-                New
-              </span>
-            )}
           </div>
           <p className="text-gray-600 dark:text-gray-400">{job?.companyName}</p>
         </div>
+        
         <div className="flex items-center gap-2">
           <span className={`px-2 py-1 text-xs rounded-full ${
             job?.jobType === 'Full-time' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
@@ -38,6 +28,15 @@ const Job = ({ job }) => {
           }`}>
             {job?.jobType}
           </span>
+          
+          <button 
+            onClick={handleBookmarkClick}
+            className="p-2 text-gray-400 hover:text-[#7209b7] dark:hover:text-[#9d4edd] transition-colors"
+            aria-label="View job details in new tab"
+            title="View details in new tab"
+          >
+            <Bookmark className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
@@ -45,11 +44,7 @@ const Job = ({ job }) => {
         <p className="text-gray-700 dark:text-gray-300 line-clamp-3">{job?.description}</p>
       </div>
 
-      <div className="flex justify-between items-center mt-6">
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          {daysAgo === 0 ? "Today" : `${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago`}
-        </div>
-        
+      <div className="flex justify-end mt-6">
         <div className="flex gap-3">
           <Button 
             variant="outline" 
@@ -65,9 +60,9 @@ const Job = ({ job }) => {
             Apply
           </Button>
         </div>
-      </div> 
+      </div>
     </div>
   );
 };
 
-export default Job;
+export default JobR;

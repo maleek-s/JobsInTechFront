@@ -9,7 +9,7 @@
     "redirects": [
       {
         "source": "/sitemap.xml",
-        "destination": "https://job-portal-r.onrender.com/sitemap.xml",
+        "destination": "https://server.jobsintech.live/sitemap.xml",
         "type": 301
       }
     ],

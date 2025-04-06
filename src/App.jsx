@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Login from './components/auth/Login'
 import Signup from './components/auth/Signup'
@@ -10,6 +11,10 @@ import ProtectedRoute from './components/admin/ProtectedRoute'
 import JobsByCategory from './components/JobsByCategory'
 import Contact from './components/Contact'
 import NotFoundPage from './components/NotFoundPage'
+import RemoteJobs from './components/RemoteJobs'
+import axios from "axios";
+
+axios.defaults.withCredentials = true;
 
 
 const appRouter = createBrowserRouter([
@@ -42,6 +47,10 @@ const appRouter = createBrowserRouter([
     element: <Contact />
   },
   {
+    path: "/remote",
+    element: <RemoteJobs />
+  },
+  {
     path: "/profile", // ✅ Regular users can access this
     element: <ProtectedRoute><Profile /></ProtectedRoute>
   },
@@ -56,6 +65,20 @@ const appRouter = createBrowserRouter([
 ]);
 
 function App() {
+
+  useEffect(() => {
+    const fetchUser = async () => {
+        try {
+            const res = await axios.get(`${USER_API_END_POINT}/me`, { withCredentials: true });
+            if (res.data.success) {
+                dispatch(setUser(res.data.user));  // Set user in Redux store
+            }
+        } catch (error) {
+        }
+    };
+  
+    fetchUser();
+  }, []);
 
   return (
     <div>

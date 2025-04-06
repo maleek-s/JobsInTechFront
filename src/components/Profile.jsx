@@ -55,7 +55,7 @@ const Profile = () => {
       <Navbar />
       <div className="max-w-4xl mx-auto border border-gray-200 dark:border-gray-700 rounded-2xl mt-20 px-6 py-6">
         {/* Enhanced Profile Header */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 overflow-scroll">
           <AvatarComponent
             classes="rounded-full"
             useGravatar={false}
@@ -112,8 +112,15 @@ const Profile = () => {
 
       {/* Horizontal Layout for Recommended and Saved Jobs */}
       <div className="max-w-4xl mx-auto mt-8 grid grid-cols-1 gap-4">
+        
+        {/* Applied Jobs Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl">
+          <h1 className="flex justify-center font-bold text-lg my-5">Saved Jobs</h1>
+          <AppliedJobTable />
+        </div>
+
         {/* Personalized Recommendations Section */}
-        <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+      <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
           <h2 className="flex justify-center text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Recommended Jobs
           </h2>
@@ -134,12 +141,6 @@ const Profile = () => {
               </li>
             ))}
           </ul>
-        </div>
-
-        {/* Applied Jobs Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl">
-          <h1 className="flex justify-center font-bold text-lg my-5">Saved Jobs</h1>
-          <AppliedJobTable />
         </div>
       </div>
 

@@ -55,13 +55,13 @@ const HeroSection = () => {
   return (
     <div className="text-center">
       <div className="flex flex-col items-center gap-5 mt-10 pt-12">
-        <h3 className="text-5xl md:text-6xl sm:text-4xl md:text-6xl lg:mt-16 font-bold">
+        <h1 className="text-5xl md:text-6xl sm:text-4xl md:text-6xl lg:mt-16 font-bold">
           Jobs In{" "}
           <span className="bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text ">
             Tech
           </span>
           , Nothing Else
-        </h3>
+        </h1>
         <div className="search-bar mt-3 w-4/5 md:w-2/5">
           <div className="flex relative" ref={searchContainerRef}>
             <input
@@ -112,9 +112,9 @@ const HeroSection = () => {
                         navigate(`/description/${job._id}`); // No need to pass similarJobs here
                       }}
                     >
-                      <h3 className="font-bold dark:text-white text-black">
+                      <h2 className="font-bold dark:text-white text-black">
                         {job.description}
-                      </h3>
+                      </h2>
                       <p className="dark:text-gray-100 text-slate-700">
                         {job.company}
                       </p>

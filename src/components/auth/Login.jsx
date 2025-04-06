@@ -79,35 +79,34 @@ const Login = () => {
     }
   }, []);
 
+
   const googleLoginHandler = async (e) => {
     e.preventDefault(); // Prevent default form submission
-
-    const result = await signInWithGoogle();
-
+  
+    const result = await signInWithGoogle(); // Assume this returns { idToken, success }
+  
     if (result.success) {
-        try {
-            const res = await axios.post(
-                `${USER_API_END_POINT}/google-login`,
-                { idToken: result.idToken }, // ✅ Send ID token
-                { withCredentials: true }
-            );
-
-            if (res.data.success) {
-                dispatch(setUser(res.data.user));
-
-                // Store the token in localStorage ✅
-                localStorage.setItem("token", res.data.token);
-
-                toast.success("Logged in successfully!");
-                navigate("/");
-            }
-        } catch (error) {
-            toast.error("Google Login failed.");
+      try {
+        const res = await axios.post(
+          `${USER_API_END_POINT}/google-login`,
+          { idToken: result.idToken }, // ✅ Send the ID token
+          { withCredentials: true } // Ensure cookies are handled correctly
+        );
+  
+        if (res.data.success) {
+          dispatch(setUser(res.data.user));
+          localStorage.setItem("token", res.data.token); // Store JWT token in localStorage
+          toast.success("Logged in successfully!");
+          navigate("/"); // Redirect after successful login
         }
-    } else {
+      } catch (error) {
         toast.error("Google Login failed.");
+      }
+    } else {
+      toast.error("Google Login failed.");
     }
-};
+  };
+  
 
 
   return (
@@ -115,7 +114,7 @@ const Login = () => {
       <Helmet>
         <title>Login</title>
         <meta name="description" content="Login to your account" />
-        <link rel="canonical" href="/login" />
+        <link rel="canonical" href="https://jobsintech.live/login" />
       </Helmet>
       <Link to="/">
         <img

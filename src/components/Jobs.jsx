@@ -51,7 +51,7 @@ const Jobs = () => {
       <Helmet>
         <title>All jobs</title>
         <meta name="description" content="Search for your next remote job" />
-        <link rel="canonical" href="/jobs" />
+        <link rel="canonical" href="https://jobsintech.live/jobs" />
       </Helmet>
       <Navbar />
       <div className="max-w-7xl mx-auto mt-20 px-4 md:px-0">

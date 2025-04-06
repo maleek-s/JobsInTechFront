@@ -6,6 +6,12 @@ import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { JOB_API_END_POINT } from "@/utils/constant";
 
+const formatCategoryDisplayName = (category) => {
+  return category
+    .replace(/([a-z])([A-Z])/g, "$1 $2") // Add space between camel case words
+    .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter of each word
+};
+
 const JobsByCategory = () => {
   const { category } = useParams();
   const [filteredJobs, setFilteredJobs] = useState([]);
@@ -19,11 +25,11 @@ const JobsByCategory = () => {
           const response = await axios.get(`${JOB_API_END_POINT}/categories/${category}`);
           if (response.data.success) {
             setFilteredJobs(response.data.jobs);
-  
+
             // Check sessionStorage for a previously selected job
             const savedJobId = sessionStorage.getItem("selectedJobId");
             const savedJob = response.data.jobs.find((job) => job._id === savedJobId);
-  
+
             // Restore the saved job or set the first job as default
             if (savedJob) {
               setSelectedJob(savedJob);
@@ -40,10 +46,9 @@ const JobsByCategory = () => {
         setFilteredJobs([]);
       }
     };
-  
+
     fetchJobsByCategory();
   }, [category]);
-  
 
   const handleJobClick = (job) => {
     if (selectedJob && selectedJob._id === job._id) return;
@@ -55,24 +60,22 @@ const JobsByCategory = () => {
       setIsTransitioning(false);
     }, 200); // Duration matches the transition effect
   };
-  
 
   return (
     <div className="dark:bg-[#141718] bg-[#F5F5F5] h-screen overflow-scroll flex flex-col">
       <Helmet>
-        <title>{category ? `${category} Jobs` : "Jobs"}</title>
+        <title>{category ? `${formatCategoryDisplayName(category)} Jobs` : "Jobs"}</title>
         <meta
           name="description"
-          content={`Browse jobs in the ${category} category`}
+          content={`Find the best job opportunities in ${category}. Browse top companies hiring today!`}
         />
-        <link rel="canonical" href={`/categories/${category}`} />
+        <link rel="canonical" href={`https://jobsintech.live/categories/${category}`} />
       </Helmet>
       <Navbar />
       <div className="flex flex-col lg:flex-row w-[90%] h-[85vh] lg:h-[80vh] rounded-lg dark:border-0 border border-gray-300 shadow-inner mx-auto mt-20 px-4 md:px-0 dark:bg-[#232627]">
-        {/* Left Panel: Job List */}
         <div className="md:w-full lg:w-1/3 pr-0 lg:pr-4 border-r lg:border-gray-300 h-auto overflow-scroll mx-1 lg:mx-6">
           <h1 className="font-bold text-lg md:text-xl my-4">
-            {category ? `${category} Jobs` : "All Jobs"} ({filteredJobs.length})
+            {category ? `${formatCategoryDisplayName(category)} Jobs` : "All Jobs"} ({filteredJobs.length})
           </h1>
           {filteredJobs.length > 0 ? (
             filteredJobs.map((job) => (
@@ -94,7 +97,6 @@ const JobsByCategory = () => {
                     {job.company}
                   </span>
                 </p>
-                {/* Mobile-only button */}
                 <Link
                   to={`/description/${job._id}`}
                   className="block mt-4 text-blue-500 hover:underline text-sm lg:hidden"
@@ -109,7 +111,6 @@ const JobsByCategory = () => {
             </p>
           )}
         </div>
-        {/* Right Panel: Job Details */}
         <div
           className={`hidden lg:block w-full h-auto overflow-scroll lg:w-2/3 pl-4 m-5 transform transition-transform duration-300 ${
             isTransitioning
@@ -119,9 +120,7 @@ const JobsByCategory = () => {
         >
           {selectedJob ? (
             <div>
-              <h2 className="font-bold text-xl mb-4">
-                {selectedJob.description}
-              </h2>
+              <h2 className="font-bold text-xl mb-4">{selectedJob.description}</h2>
               <p className="dark:text-gray-300 text-gray-700 mb-4">
                 <span className="font-semibold">Company: </span>
                 <span className="font-semibold">{selectedJob.company}</span>

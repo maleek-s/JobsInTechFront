@@ -25,7 +25,10 @@ const useGetAppliedJobs = () => {
         }
 
         const res = await axios.get(`${APPLICATION_API_END_POINT}/get`, {
-          headers,
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          withCredentials: true, // ✅ This must match the server config
         });
 
         if (res.data.success) {

@@ -20,10 +20,8 @@ const persistConfig = {
   key: "root",
   version: 1,
   storage,
-  whitelist: ["job", "application", "categories"], // Persist categories too
+  whitelist: ["auth", "job", "application", "categories", "company"], // ✅ Persist auth too
 };
-
-
 
 const rootReducer = combineReducers({
   auth: authSlice,

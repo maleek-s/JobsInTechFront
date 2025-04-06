@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-column justify-between items-center">
           <div className="md:mb-0">
-            <p className="text-sm">© 2024 Your Company. All rights reserved.</p>
+            <p className="text-sm">© 2025 Jobs in Tech. All rights reserved.</p>
           </div>
         </div>
       </div>

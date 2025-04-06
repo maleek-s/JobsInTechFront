@@ -112,7 +112,7 @@ const Signup = () => {
       <Helmet>
         <title>Sign In</title>
         <meta name="description" content="Signup" />
-        <link rel="canonical" href="/signin" />
+        <link rel="canonical" href="https://jobsintech.live/signin" />
       </Helmet>
 
       <Link to="/">
