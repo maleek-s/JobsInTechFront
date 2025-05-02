@@ -1,54 +1,42 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import Navbar from "./shared/Navbar";
 import Footer from "./shared/Footer";
 import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { JOB_API_END_POINT } from "@/utils/constant";
-
-const formatCategoryDisplayName = (category) => {
-  return category
-    .replace(/([a-z])([A-Z])/g, "$1 $2") // Add space between camel case words
-    .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter of each word
-};
+import { useDispatch, useSelector } from "react-redux";
+import { fetchJobsByCategory } from "@/redux/thunks/fetchJobsByCategory";
 
 const JobsByCategory = () => {
+  const dispatch = useDispatch();
   const { category } = useParams();
-  const [filteredJobs, setFilteredJobs] = useState([]);
+  const filteredJobs = useSelector((state) => state.job.jobsByCategory || []);
+  const loading = useSelector((state) => state.job.categoryLoading);
+  const error = useSelector((state) => state.job.categoryError);
+
   const [selectedJob, setSelectedJob] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  const formatCategoryDisplayName = (category) => {
+    return category
+      .replace(/([a-z])([A-Z])/g, "$1 $2") // Add space between camel case words
+      .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter of each word
+  };
+
   useEffect(() => {
-    const fetchJobsByCategory = async () => {
-      try {
-        if (category) {
-          const response = await axios.get(`${JOB_API_END_POINT}/categories/${category}`);
-          if (response.data.success) {
-            setFilteredJobs(response.data.jobs);
+    if (category) {
+      dispatch(fetchJobsByCategory(category));
+    }
+  }, [category, dispatch]);
 
-            // Check sessionStorage for a previously selected job
-            const savedJobId = sessionStorage.getItem("selectedJobId");
-            const savedJob = response.data.jobs.find((job) => job._id === savedJobId);
-
-            // Restore the saved job or set the first job as default
-            if (savedJob) {
-              setSelectedJob(savedJob);
-            } else if (response.data.jobs.length > 0) {
-              setSelectedJob(response.data.jobs[0]);
-            }
-          } else {
-            console.error("Failed to fetch jobs");
-            setFilteredJobs([]);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
-        setFilteredJobs([]);
-      }
-    };
-
-    fetchJobsByCategory();
-  }, [category]);
+  useEffect(() => {
+    if (filteredJobs.length > 0) {
+      const savedJobId = sessionStorage.getItem("selectedJobId");
+      const savedJob = filteredJobs.find((job) => job._id === savedJobId);
+      setSelectedJob(savedJob || filteredJobs[0]);
+    } else {
+      setSelectedJob(null);
+    }
+  }, [filteredJobs]);
 
   const handleJobClick = (job) => {
     if (selectedJob && selectedJob._id === job._id) return;
@@ -82,20 +70,14 @@ const JobsByCategory = () => {
               <div
                 key={job._id}
                 onClick={() => handleJobClick(job)}
-                className={`p-4 border mb-4 rounded-lg shadow-md cursor-pointer w-[95%] hover:dark:bg-[#343839] hover:bg-[#EAEAEA] ${
-                  selectedJob && selectedJob._id === job._id
-                    ? "bg-[#EAEAEA] dark:bg-[#343839]"
-                    : "dark:bg-[#232627]"
-                }`}
+                className={`p-4 border mb-4 rounded-lg shadow-md cursor-pointer w-[95%] hover:dark:bg-[#343839] hover:bg-[#EAEAEA] ${selectedJob && selectedJob._id === job._id
+                  ? "bg-[#EAEAEA] dark:bg-[#343839]"
+                  : "dark:bg-[#232627]"}`}
               >
                 <h2 className="font-bold text-md">{job.description}</h2>
                 <p className="text-sm text-gray-600">
-                  <span className="font-semibold dark:text-gray-300">
-                    Company:{" "}
-                  </span>
-                  <span className="font-semibold dark:text-gray-300">
-                    {job.company}
-                  </span>
+                  <span className="font-semibold dark:text-gray-300">Company: </span>
+                  <span className="font-semibold dark:text-gray-300">{job.company}</span>
                 </p>
                 <Link
                   to={`/description/${job._id}`}
@@ -106,17 +88,11 @@ const JobsByCategory = () => {
               </div>
             ))
           ) : (
-            <p className="text-center text-gray-500">
-              No jobs found in this category.
-            </p>
+            <p className="text-center text-gray-500">No jobs found in this category.</p>
           )}
         </div>
         <div
-          className={`hidden lg:block w-full h-auto overflow-scroll lg:w-2/3 pl-4 m-5 transform transition-transform duration-300 ${
-            isTransitioning
-              ? "opacity-0 translate-x-10"
-              : "opacity-100 translate-x-0"
-          }`}
+          className={`hidden lg:block w-full h-auto overflow-scroll lg:w-2/3 pl-4 m-5 transform transition-transform duration-300 ${isTransitioning ? "opacity-0 translate-x-10" : "opacity-100 translate-x-0"}`}
         >
           {selectedJob ? (
             <div>
@@ -127,9 +103,7 @@ const JobsByCategory = () => {
               </p>
               {selectedJob.jobContent && selectedJob.jobContent.length > 0 && (
                 <div className="mb-4">
-                  <h3 className="font-semibold text-md">
-                    {selectedJob.jobContent[0].heading}
-                  </h3>
+                  <h3 className="font-semibold text-md">{selectedJob.jobContent[0].heading}</h3>
                   <ul className="list-disc ml-6 text-sm dark:text-white text-gray-600">
                     {selectedJob.jobContent[0].content.map((item, idx) => (
                       <li key={idx}>{item}</li>

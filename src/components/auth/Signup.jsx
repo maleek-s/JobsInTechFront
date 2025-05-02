@@ -45,57 +45,42 @@ const Signup = () => {
   // ✅ Password Strength Validation Function
   const validatePassword = (password) => {
     const strongPasswordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-    if (!password) {
-      setPasswordStrength("");
-      setIsPasswordValid(false);
-      return;
-    }
-
-    if (password.length < 8) {
-      setPasswordStrength("Password must be at least 8 characters.");
-      setIsPasswordValid(false);
-    } else if (!/[A-Z]/.test(password)) {
-      setPasswordStrength("Include at least one uppercase letter.");
-      setIsPasswordValid(false);
-    } else if (!/[a-z]/.test(password)) {
-      setPasswordStrength("Include at least one lowercase letter.");
-      setIsPasswordValid(false);
-    } else if (!/\d/.test(password)) {
-      setPasswordStrength("Include at least one number.");
-      setIsPasswordValid(false);
-    } else if (!/[@$!%*?&]/.test(password)) {
-      setPasswordStrength("Include at least one special character (@$!%*?&).");
-      setIsPasswordValid(false);
-    } else {
-      setPasswordStrength("✅ Strong password!");
-      setIsPasswordValid(true);
-    }
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    setIsPasswordValid(strongPasswordRegex.test(password));
+    setPasswordStrength(
+      strongPasswordRegex.test(password) ? "Strong" : "Weak"
+    );
   };
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    if (!isPasswordValid) return; // Prevent submission if password is weak
-
-    const formData = new FormData();
-    formData.append("fullname", input.fullname);
-    formData.append("email", input.email);
-    formData.append("password", input.password);
+    if (!isPasswordValid) {
+      toast.error("Password is too weak! It should contain uppercase, lowercase, a number, and a special character.");
+      return;
+    }
 
     try {
       dispatch(setLoading(true));
-      const res = await axios.post(`${USER_API_END_POINT}/register`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      });
+
+      const res = await axios.post(
+        `${USER_API_END_POINT}/signup`,
+        input,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "API-Key": process.env.VITE_JOBS_API_KEY, // Include API key in request headers
+          },
+          withCredentials: true,
+        }
+      );
+
       if (res.data.success) {
-        navigate("/login");
-        toast.success(res.data.message);
+        toast.success("Signup successful!");
+        navigate("/login"); // Redirect to login page after signup
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
+      console.error(error);
+      toast.error(error.response?.data?.message || "Signup failed");
     } finally {
       dispatch(setLoading(false));
     }
@@ -103,9 +88,9 @@ const Signup = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate("/"); // Redirect to home if user is already logged in
     }
-  }, []);
+  }, [user, navigate]);
 
   return (
     <div className="bg-[#141718] h-screen">

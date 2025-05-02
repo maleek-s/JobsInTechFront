@@ -1,7 +1,7 @@
 import { setAllAppliedJobs } from "@/redux/jobSlice";
-import { setLoading } from "@/redux/loadingSlice"; // Import setLoading action
+import { setLoading } from "@/redux/loadingSlice";
 import { APPLICATION_API_END_POINT } from "@/utils/constant";
-import axios from "axios";
+import axiosInstance from "@/utils/axiosInstance";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
@@ -10,40 +10,37 @@ const useGetAppliedJobs = () => {
 
   useEffect(() => {
     const fetchAppliedJobs = async () => {
-      dispatch(setLoading(true)); // Show Loader
-
+      dispatch(setLoading(true));
       try {
-        const token = localStorage.getItem("token");
+        // Prefer the token from cookies
+        const tokenFromCookie = document.cookie.split('; ').find(row => row.startsWith('token='));
+        const token = tokenFromCookie ? tokenFromCookie.split('=')[1] : localStorage.getItem("token");
 
-        const headers = {
-          Authorization: token ? `Bearer ${token}` : "",
-          withCredentials: true, // Keep this for cookies
-        };
-
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
+        if (!token) {
+          console.warn("No authentication token found.");
+          return; // You can handle this case, for example, by redirecting to login
         }
 
-        const res = await axios.get(`${APPLICATION_API_END_POINT}/get`, {
+        const res = await axiosInstance.get(`${APPLICATION_API_END_POINT}/get`, {
           headers: {
-            Authorization: token ? `Bearer ${token}` : "",
+            Authorization: `Bearer ${token}`,
           },
-          withCredentials: true, // ✅ This must match the server config
         });
 
         if (res.data.success) {
           dispatch(setAllAppliedJobs(res.data.applications));
         }
       } catch (error) {
-        if (error.response && error.response.status === 404) {
+        if (error.response?.status === 404) {
           dispatch(setAllAppliedJobs([]));
         } else {
-          console.log(error);
+          console.error("Error fetching applied jobs:", error);
         }
       } finally {
-        dispatch(setLoading(false)); // Hide Loader
+        dispatch(setLoading(false));
       }
     };
+
     fetchAppliedJobs();
   }, [dispatch]);
 };

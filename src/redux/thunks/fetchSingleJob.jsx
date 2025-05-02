@@ -1,16 +1,13 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import axiosInstance from "@/utils/axiosInstance";
 import { JOB_API_END_POINT } from "@/utils/constant";
 
 // Thunk to fetch a single job by ID
 export const fetchSingleJob = createAsyncThunk(
   "job/fetchSingleJob",
-  async (jobId, { rejectWithValue }) => {
+  async (jobId, { rejectWithValue }) => { 
     try {
-      const response = await axios.get(`${JOB_API_END_POINT}/get/${jobId}`, {
-        withCredentials: true,
-      });
-
+      const response = await axiosInstance.get(`${JOB_API_END_POINT}/get/${jobId}`);
       if (response.data.success) {
         return response.data.job;
       } else {
@@ -21,3 +18,4 @@ export const fetchSingleJob = createAsyncThunk(
     }
   }
 );
+

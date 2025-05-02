@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import Navbar from "./shared/Navbar";
 import { Helmet } from "react-helmet-async";
 import Bitmap from "../assets/Bitmap.svg";
+import axiosInstance from "@/utils/axiosInstance";
 import {
   ArrowLeft,
   ArrowRight,
@@ -34,6 +35,7 @@ const JobDescription = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isApplying, setIsApplying] = useState(false);
+  const scrollContainerRef = useRef(null);
 
   const { id: jobId } = useParams();
   const navigate = useNavigate();
@@ -83,24 +85,21 @@ const JobDescription = () => {
 
     setIsApplying(true);
     try {
-      const res = await axios.post(
+      const res = await axiosInstance.post(
         `${APPLICATION_API_END_POINT}/post/${jobId}`,
-        { applicant: user._id },
-        { withCredentials: true }
+        { applicant: user._id }
       );
 
       if (res.data.success) {
         toast.success(res.data.message || "Job saved successfully!");
 
-        // Update singleJob state in Redux
         dispatch(
           setSingleJob({
             ...singleJob,
-            appliedUsers: [...(singleJob?.appliedUsers || []), user._id], // Add the current user to appliedUsers
+            appliedUsers: [...(singleJob?.appliedUsers || []), user._id],
           })
         );
 
-        // Update local state
         setIsApplied(true);
       }
     } catch (error) {
@@ -143,18 +142,29 @@ const JobDescription = () => {
       .catch((err) => console.error("Failed to copy URL:", err));
   };
 
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [jobId]);
+
   return (
-    <div className="dark:bg-[#141718] h-screen overflow-scroll flex flex-col">
+    <div
+      className="dark:bg-[#141718] h-screen overflow-scroll flex flex-col"
+      ref={scrollContainerRef}
+    >
       <Helmet>
         <title>{singleJob?.title || "Job Details"}</title>
         <meta
           name="description"
           content={singleJob?.description || "Job description page."}
         />
-        <link rel="canonical" href={`https://jobsintech.live/description/${jobId}`} />
+        <link
+          rel="canonical"
+          href={`https://jobsintech.live/description/${jobId}`}
+        />
       </Helmet>
       <Navbar />
-
       <div>
         {/* Job Header */}
         <div
@@ -269,17 +279,18 @@ const JobDescription = () => {
                 <a
                   href={
                     singleJob?.jobLink
-                      ? singleJob.jobLink.startsWith('http')
+                      ? singleJob.jobLink.startsWith("http")
                         ? singleJob.jobLink
                         : `https://${singleJob.jobLink}`
-                      : '#'
+                      : "#"
                   }
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 hover:underline"
                 >
                   {singleJob?.jobLink
-                    ? new URL(singleJob.jobLink).hostname.replace(/^www\./, '') : ''}
+                    ? new URL(singleJob.jobLink).hostname.replace(/^www\./, "")
+                    : ""}
                 </a>
               </p>
               <p className="text-gray-700 dark:text-gray-300">

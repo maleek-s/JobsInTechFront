@@ -4,11 +4,11 @@ import { Button } from "../ui/button";
 import { Avatar } from "../ui/avatar";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { setUser } from "@/redux/authSlice";
 import { toast } from "sonner";
 import { AvatarComponent } from "avatar-initials";
+import axiosInstance from "@/utils/axiosInstance"; // Import the custom axiosInstance
 import {
   Moon,
   Mail,
@@ -145,9 +145,11 @@ const Navbar = ({ isHomePage }) => {
 
     const logoutHandler = async () => {
       try {
-        const res = await axios.get(`${USER_API_END_POINT}/logout`, {
+        // Use axiosInstance for the logout API request
+        const res = await axiosInstance.get(`${USER_API_END_POINT}/logout`, {
           withCredentials: true,
         });
+  
         if (res.data.success) {
           dispatch(setUser(null));
           navigate(window.location.pathname); // No need to encode the pathname
@@ -157,8 +159,7 @@ const Navbar = ({ isHomePage }) => {
         console.log(error);
         toast.error(error.response?.data?.message || "An error occurred");
       }
-    };
-    
+    };    
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);

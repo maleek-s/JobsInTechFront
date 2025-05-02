@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { searchJobs } from "./thunks/searchJob";
 import { fetchSingleJob } from "./thunks/fetchSingleJob";
 import { fetchSimilarJobs } from "./thunks/fetchSimilarJobs";
+import { fetchJobsByCategory } from "./thunks/fetchJobsByCategory";
 
 const jobSlice = createSlice({
   name: "job",
@@ -31,6 +32,9 @@ const jobSlice = createSlice({
     singleJobError: null,
     similarJobsLoading: false,
     similarJobsError: null,
+    jobsByCategory: [],
+    categoryLoading: false,
+    categoryError: null,
   },
   reducers: {
     setAllJobs: (state, action) => {
@@ -100,6 +104,18 @@ const jobSlice = createSlice({
       .addCase(fetchSimilarJobs.rejected, (state, action) => {
         state.similarJobsLoading = false;
         state.similarJobsError = action.payload;
+      })
+      .addCase(fetchJobsByCategory.pending, (state) => {
+        state.categoryLoading = true;
+        state.categoryError = null;
+      })
+      .addCase(fetchJobsByCategory.fulfilled, (state, action) => {
+        state.categoryLoading = false;
+        state.jobsByCategory = action.payload;
+      })
+      .addCase(fetchJobsByCategory.rejected, (state, action) => {
+        state.categoryLoading = false;
+        state.categoryError = action.payload;
       });
   },
 });

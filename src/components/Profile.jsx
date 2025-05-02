@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./shared/Navbar";
 import { Button } from "./ui/button";
-import { Mail, Pen } from "lucide-react";
+import { Pen } from "lucide-react";
 import AppliedJobTable from "./AppliedJobTable";
 import UpdateProfileDialog from "./UpdateProfileDialog";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useGetAppliedJobs from "@/hooks/useGetAppliedJobs";
 import { AvatarComponent } from "avatar-initials";
-import { JOB_API_END_POINT } from "@/utils/constant";
-
-import axios from "axios";
+import { JOB_API_END_POINT, API_KEY } from "@/utils/constant";
+import axios from "@/utils/axiosInstance";  // Use the axios instance with interceptor
 
 const Profile = () => {
   useGetAppliedJobs(); // Fetches applied jobs and updates Redux store
@@ -30,8 +29,10 @@ const Profile = () => {
       ];
 
       const recommendedJobsList = [];
+
       for (const category of uniqueCategories) {
         try {
+          // Make the API request with the headers managed by the interceptor
           const response = await axios.get(
             `${JOB_API_END_POINT}/categories/${category}`
           );
@@ -39,7 +40,9 @@ const Profile = () => {
           if (response.data.jobs && Array.isArray(response.data.jobs)) {
             recommendedJobsList.push(...response.data.jobs.slice(0, 2));
           }
-        } catch (error) {}
+        } catch (error) {
+          console.error("Error fetching recommended jobs:", error);
+        }
       }
 
       setRecommendedJobs(recommendedJobsList);
@@ -65,7 +68,7 @@ const Profile = () => {
             fontSize={24}
             fontWeight={600}
             offsetY={35}
-            initials={`${user?.fullname.substring(0, 2).toUpperCase()}`}
+            initials={user?.fullname ? `${user?.fullname.substring(0, 2).toUpperCase()}` : "XX"}
           />
           <div>
             <h1 className="font-bold text-2xl text-gray-900 dark:text-gray-100">
@@ -112,7 +115,6 @@ const Profile = () => {
 
       {/* Horizontal Layout for Recommended and Saved Jobs */}
       <div className="max-w-4xl mx-auto mt-8 grid grid-cols-1 gap-4">
-        
         {/* Applied Jobs Section */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl">
           <h1 className="flex justify-center font-bold text-lg my-5">Saved Jobs</h1>
@@ -120,7 +122,7 @@ const Profile = () => {
         </div>
 
         {/* Personalized Recommendations Section */}
-      <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+        <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
           <h2 className="flex justify-center text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Recommended Jobs
           </h2>
@@ -135,7 +137,10 @@ const Profile = () => {
                     At {job.company}
                   </p>
                 </div>
-                <Button size="sm"  onClick={() => navigate(`/description/${job._id}`)}>
+                <Button
+                  size="sm"
+                  onClick={() => navigate(`/description/${job._id}`)}
+                >
                   View
                 </Button>
               </li>

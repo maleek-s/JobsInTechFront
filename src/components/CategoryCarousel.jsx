@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setSearchedQuery } from "@/redux/jobSlice";
@@ -24,17 +24,18 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-const formatCategoryDisplayName = (category) => {
-  return category
-    .replace(/([a-z])([A-Z])/g, "$1 $2") // Add space between camel case words
-    .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter of each word
-};
-
 const CategoryCarousel = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [fetchTriggered, setFetchTriggered] = useState(false);
 
+  const formatCategoryDisplayName = (category) => {
+    return category
+      .replace(/([a-z])([A-Z])/g, "$1 $2") // Add space between camel case words
+      .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter of each word
+  };
+
+  // Call useFetchCategories hook unconditionally
   useFetchCategories();
 
   const categoryIconMap = {
@@ -76,15 +77,8 @@ const CategoryCarousel = () => {
     .filter((category) => category)
     .sort((a, b) => a.localeCompare(b));
 
-  const handleMouseEnter = () => {
-    if (!fetchTriggered) {
-      useFetchCategories();
-      setFetchTriggered(true);
-    }
-  };
-
   return (
-    <div className="w-full dark:bg-[#141718] mt-10" onMouseEnter={handleMouseEnter}>
+    <div className="w-full dark:bg-[#141718] mt-10">
       <div className="flex justify-center items-center">
         <div className="flex flex-wrap w-11/12 md:w-8/12 justify-center">
           {sortedCategories.map((category, index) => {

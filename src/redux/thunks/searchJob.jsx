@@ -1,14 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "@/utils/axiosInstance";
 
 export const searchJobs = createAsyncThunk(
-  "jobs/search", 
+  "jobs/search",
   async (query, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/v1/job/search`, { params: { query } });
+      const response = await axiosInstance.get(`https://server.jobsintech.live/api/v1/job/search`, {
+        params: { query },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
+

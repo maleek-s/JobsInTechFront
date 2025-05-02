@@ -7,6 +7,7 @@ import Logo from "../../assets/Logo.png";
 import { Button } from "../ui/button";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
+import cryptoJS from "crypto-js";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,6 +25,10 @@ const Login = () => {
   const dispatch = useDispatch();
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [searchParams] = useSearchParams();
+  const secretKey = import.meta.env.VITE_JOBS_API_KEY;
+  const timestamp = Date.now().toString();
+  const dataToSign = `${secretKey}:${timestamp}`;
+  const digest = cryptoJS.SHA512(dataToSign).toString();
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -32,33 +37,35 @@ const Login = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-        dispatch(setLoading(true));
-        const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            withCredentials: true, // Ensures cookies are sent
-        });
+      dispatch(setLoading(true));
+      const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-digest": digest,
+          "x-timestamp": timestamp,
+        },
+        withCredentials: true, // Ensures cookies are sent
+      });
 
-        if (res.data.success) {
-            dispatch(setUser(res.data.user));
+      if (res.data.success) {
+        dispatch(setUser(res.data.user));
 
-            // Store the token in localStorage ✅
-            localStorage.setItem("token", res.data.token);
+        // Store the token in localStorage ✅
+        localStorage.setItem("token", res.data.token);
 
-            const redirectUrl = searchParams.get("redirect") || "/";
-            navigate(redirectUrl);
-            toast.success(res.data.message);
-        }
+        const redirectUrl = searchParams.get("redirect") || "/";
+        navigate(redirectUrl);
+        toast.success(res.data.message);
+      }
     } catch (error) {
-        console.error(error);
-        const errorMessage = error.response?.data?.message || "An unexpected error occurred.";
-        toast.error(errorMessage);
+      console.error(error);
+      const errorMessage =
+        error.response?.data?.message || "An unexpected error occurred.";
+      toast.error(errorMessage);
     } finally {
-        dispatch(setLoading(false));
+      dispatch(setLoading(false));
     }
-};
-
+  };
 
   useEffect(() => {
     if (user) {
@@ -79,20 +86,25 @@ const Login = () => {
     }
   }, []);
 
-
   const googleLoginHandler = async (e) => {
     e.preventDefault(); // Prevent default form submission
-  
+
     const result = await signInWithGoogle(); // Assume this returns { idToken, success }
-  
+
     if (result.success) {
       try {
         const res = await axios.post(
           `${USER_API_END_POINT}/google-login`,
           { idToken: result.idToken }, // ✅ Send the ID token
-          { withCredentials: true } // Ensure cookies are handled correctly
+          {
+            headers: {
+              "x-digest": digest,
+              "x-timestamp": timestamp,
+            },
+            withCredentials: true,
+          } // Ensure cookies are handled correctly
         );
-  
+
         if (res.data.success) {
           dispatch(setUser(res.data.user));
           localStorage.setItem("token", res.data.token); // Store JWT token in localStorage
@@ -106,8 +118,6 @@ const Login = () => {
       toast.error("Google Login failed.");
     }
   };
-  
-
 
   return (
     <div className="bg-[#141718] h-screen">
